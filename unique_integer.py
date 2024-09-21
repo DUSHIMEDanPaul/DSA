@@ -1,57 +1,57 @@
 import os
 
-# Constants for the integer range
-MIN_INT = -1023
-MAX_INT = 1023
-RANGE_SIZE = MAX_INT - MIN_INT + 1
+# Define bounds for the integer range
+LOW_LIMIT = -1023
+HIGH_LIMIT = 1023
+TOTAL_NUMBERS = HIGH_LIMIT - LOW_LIMIT + 1
 
-# Process the file and write unique sorted integers to the destination file
-def handle_file(src_file_path, dest_file_path):
-    # Initialize a boolean array to track unique integers
-    unique_numbers = [False] * RANGE_SIZE
+# Function to read from the input file and save unique sorted numbers in the output file
+def process_file(input_path, output_path):
+    # Boolean list to track occurrence of integers
+    number_tracker = [False] * TOTAL_NUMBERS
 
     try:
-        with open(src_file_path, 'r') as src_file:
-            for line in src_file:
-                value = parse_line(line.strip())
-                if value is not None:
-                    # Mark the integer as seen
-                    unique_numbers[value - MIN_INT] = True
+        with open(input_path, 'r') as infile:
+            for line in infile:
+                num = extract_integer(line.strip())
+                if num is not None:
+                    # Mark the number as found
+                    number_tracker[num - LOW_LIMIT] = True
 
-        with open(dest_file_path, 'w') as dest_file:
-            # Write out the unique sorted integers
-            for i in range(RANGE_SIZE):
-                if unique_numbers[i]:
-                    dest_file.write(f"{i + MIN_INT}\n")
+        with open(output_path, 'w') as outfile:
+            # Write sorted unique numbers to output file
+            for index in range(TOTAL_NUMBERS):
+                if number_tracker[index]:
+                    outfile.write(f"{index + LOW_LIMIT}\n")
 
-    except (FileNotFoundError, IOError) as error:
-        print(f"File operation failed: {error}")
+    except (IOError, FileNotFoundError) as e:
+        print(f"Error handling the file: {e}")
 
-# Parse a line to check if it contains a valid single integer
-def parse_line(line):
-    # Split the line by whitespace
-    parts = line.split()
+# Function to extract a valid integer from a line
+def extract_integer(line):
+    # Break the line into components based on whitespace
+    elements = line.split()
 
-    # Skip if there are multiple numbers or non-integer input
-    if len(parts) != 1:
+    # Return None if there's more than one element or if it's not an integer
+    if len(elements) != 1:
         return None
 
-    # Check if the part is a valid integer and within the specified range
+    # Try to convert to an integer and verify it falls within the specified range
     try:
-        number = int(parts[0])
-        if MIN_INT <= number <= MAX_INT:
-            return number
+        parsed_num = int(elements[0])
+        if LOW_LIMIT <= parsed_num <= HIGH_LIMIT:
+            return parsed_num
     except ValueError:
-        pass
+        return None
 
     return None
 
 if __name__ == "__main__":
-    src_path = 'DSA/small_sample_input_02.txt'
-    dest_path = 'DSA/sample_input_02.txt_results.txt'
+    input_file = 'DSA/small_sample_input_02.txt'
+    output_file = 'DSA/sample_input_02.txt_results.txt'
 
-    if os.path.exists(src_path):
-        handle_file(src_path, dest_path)
-        print(f"The file has been processed and saved to {dest_path}")
+    if os.path.isfile(input_file):
+        process_file(input_file, output_file)
+        print(f"File processing completed and saved to {output_file}")
     else:
-        print(f"The file {src_path} is not found")
+        print(f"Error: Input file {input_file} not found")
